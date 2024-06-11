@@ -12,7 +12,7 @@ public class Employee {
     private String firstName;
     @Column(name="last_name")
     private String lastName;
-    private String email;
+    private String email2;
 
     public long getId() {
         return id;
@@ -39,10 +39,10 @@ public class Employee {
     }
 
     public String getEmail() {
-        return email;
+        return email2;
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        this.email2 = email;
     }
 }

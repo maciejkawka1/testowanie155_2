@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -52,7 +53,41 @@ class EmployeeRepositoryTest {
         assertThat(employees.size()).isEqualTo(2);
     }
     // pobieranie pracownika po id
-    // pobieranie pracownika po email
+    @Test
+    @DisplayName("Pobieranie pracownika po id")
+    void givenTwoEmployees_whenFindById_thenReturnEmployee() {
+        // given
+        Employee employee = new Employee();
+        Employee employee2 = new Employee();
+        employeeRepository.save(employee);
+        employeeRepository.save(employee2);
+
+        // when
+        Optional<Employee> byId = employeeRepository.findById(employee2.getId());
+
+        // then
+        assertThat(byId.isPresent()).isTrue();
+    }
+
+    @Test
+    @DisplayName("Pobieranie pracownika po email")
+    void x() {
+        // given
+        Employee employee = new Employee();
+        employee.setEmail("Jarek");
+        Employee employee2 = new Employee();
+        employee2.setEmail("Oliwier");
+        employeeRepository.save(employee);
+        employeeRepository.save(employee2);
+
+        // when
+        Optional<Employee> byId = employeeRepository.findByEmail(employee2.getEmail());
+
+        // then
+        assertThat(byId.isPresent()).isTrue();
+        assertThat(byId.get().getEmail()).isEqualTo("Oliwier");
+    }
+
     // uaktualnienie danych pracownika
     // usuwanie pracownika
     // znajdowanie pracownika po imieniu i nazwisku
