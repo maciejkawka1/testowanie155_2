@@ -21,6 +21,7 @@ class EmployeeRepositoryTest {
 
     @Autowired
     private EmployeeRepository employeeRepository;
+
     @Test
     @DisplayName("Zapisywanie pracownika")
     void givenEmployee_whenSave_thenReturnSavedEmployee() {
@@ -52,6 +53,7 @@ class EmployeeRepositoryTest {
         assertThat(employees).isNotNull();
         assertThat(employees.size()).isEqualTo(2);
     }
+
     // pobieranie pracownika po id
     @Test
     @DisplayName("Pobieranie pracownika po id")
@@ -133,9 +135,57 @@ class EmployeeRepositoryTest {
         employeeRepository.save(employee);
 
         // when
-        Employee foundEmployee = employeeRepository.findByFirstNameAndLastName("Ala", "Kota");
+        Employee foundEmployee = employeeRepository.findByFirstNameAndLastName("Ala", "Kota").get();
         // then
         assertThat(foundEmployee).isNotNull();
         assertThat(foundEmployee).isEqualTo(employee);
+    }
+
+    @Test
+    @DisplayName("Znajdowanie pracownika po imieniu i nazwisku")
+    void givenEmployee_whenFindByJPQL_thenReturnEmployee() {
+        // given
+        Employee employee = new Employee();
+        employee.setFirstName("Ala");
+        employee.setLastName("Kota");
+        employeeRepository.save(employee);
+
+        // when
+        Employee foundEmployee = employeeRepository.findByJPQL("Ala", "Kota").get();
+        // then
+        assertThat(foundEmployee).isNotNull();
+        assertThat(foundEmployee).isEqualTo(employee);
+    }
+
+    @Test
+    @DisplayName("Znajdowanie pracownika po imieniu i nazwisku")
+    void givenEmployee_whenFindByJPQLNativeSql_thenReturnEmployee() {
+        // given
+        Employee employee = new Employee();
+        employee.setFirstName("Ala");
+        employee.setLastName("Kota");
+        employeeRepository.save(employee);
+
+        // when
+        Optional<Employee> foundEmployee = employeeRepository.findByJPQLNativeSql("Ala", "Kota");
+        // then
+        assertThat(foundEmployee).isNotNull();
+        assertThat(foundEmployee.get()).isEqualTo(employee);
+    }
+
+    @Test
+    @DisplayName("Znajdowanie pracownika po imieniu i nazwisku")
+    void givenEmployee_whenFindByJPQLNativeSqlParam_thenReturnEmployee() {
+        // given
+        Employee employee = new Employee();
+        employee.setFirstName("Ala");
+        employee.setLastName("Kota");
+        employeeRepository.save(employee);
+
+        // when
+        Optional<Employee> foundEmployee = employeeRepository.findByJPQLNativeSqlParam("Ala", "Kota");
+        // then
+        assertThat(foundEmployee).isNotNull();
+        assertThat(foundEmployee.get()).isEqualTo(employee);
     }
 }
