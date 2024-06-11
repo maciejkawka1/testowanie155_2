@@ -8,4 +8,6 @@ import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Long> {
     Optional<Employee> findByEmail(String email); //JPA - zamieni nazwę metody na zapytanie SQL
+
+    Employee findByFirstNameAndLastName(String firstName, String lastName);
 }

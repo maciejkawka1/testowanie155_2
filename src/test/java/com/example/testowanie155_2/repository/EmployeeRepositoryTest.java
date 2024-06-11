@@ -55,15 +55,16 @@ class EmployeeRepositoryTest {
     // pobieranie pracownika po id
     @Test
     @DisplayName("Pobieranie pracownika po id")
-    void givenTwoEmployees_whenFindById_thenReturnEmployee() {
+    void givenTwoEmployees_whenFindById_thenReturnEmployee() { // można sprawdzić na MySQL
         // given
         Employee employee = new Employee();
         Employee employee2 = new Employee();
         employeeRepository.save(employee);
         employeeRepository.save(employee2);
-
+        System.out.println(employee2);
         // when
         Optional<Employee> byId = employeeRepository.findById(employee2.getId());
+        System.out.println(byId.get());
 
         // then
         assertThat(byId.isPresent()).isTrue();
@@ -71,7 +72,7 @@ class EmployeeRepositoryTest {
 
     @Test
     @DisplayName("Pobieranie pracownika po email")
-    void x() {
+    void givenTwoEmployees_whenFindByEmail_thenReturnEmployee() {
         // given
         Employee employee = new Employee();
         employee.setEmail("Jarek");
@@ -88,9 +89,53 @@ class EmployeeRepositoryTest {
         assertThat(byId.get().getEmail()).isEqualTo("Oliwier");
     }
 
-    // uaktualnienie danych pracownika
-    // usuwanie pracownika
-    // znajdowanie pracownika po imieniu i nazwisku
+    @Test
+    @DisplayName("Uaktualnienie danych pracownika")
+    void givenEmployeeWithChangedFields_whenUpdateEmployee_thenReturnUpdatedEmployee() {
+        // given
+        Employee employee = new Employee();
+        employee.setEmail("Jarek");
+        employeeRepository.save(employee);
+        Employee savedEmployee = employeeRepository.findById(employee.getId()).get();
+        savedEmployee.setEmail("AlaMaKota");
+        savedEmployee.setFirstName("Ala");
 
 
+        // when
+        Employee updatedEmployee = employeeRepository.save(savedEmployee);
+
+        // then
+        assertThat(updatedEmployee).isNotNull();
+    }
+
+    @Test
+    @DisplayName("Usuwanie pracownika")
+    void givenEmployee_whenDeleteEmployee_thenEmployeeNotPresent() {
+        // given
+        Employee employee = new Employee();
+        employeeRepository.save(employee);
+
+        // when
+        employeeRepository.deleteById(employee.getId());
+        Optional<Employee> optionalEmployee = employeeRepository.findById(employee.getId());
+
+        // then
+        assertThat(optionalEmployee).isEmpty();
+    }
+
+    @Test
+    @DisplayName("Znajdowanie pracownika po imieniu i nazwisku")
+    void givenEmployee_whenFindByFirstNameAndLastName_thenReturnEmployee() {
+        // given
+        Employee employee = new Employee();
+        employee.setFirstName("Ala");
+        employee.setLastName("Kota");
+        employeeRepository.save(employee);
+
+        // when
+        Employee foundEmployee = employeeRepository.findByFirstNameAndLastName("Ala", "Kota");
+        // then
+        assertThat(foundEmployee).isNotNull();
+        assertThat(foundEmployee).isEqualTo(employee);
+    }
 }
