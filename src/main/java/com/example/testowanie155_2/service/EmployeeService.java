@@ -4,6 +4,7 @@ import com.example.testowanie155_2.entity.Employee;
 import com.example.testowanie155_2.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,5 +24,13 @@ public class EmployeeService {
 
     public void delete(long id) {
         employeeRepository.deleteById(id);
+    }
+
+    public List<Employee> findAll() {
+        return employeeRepository.findAll();
+    }
+
+    public Optional<Employee> findById(long id) {
+        return employeeRepository.findById(id);
     }
 }
