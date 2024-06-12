@@ -21,8 +21,9 @@ class BookRepositoryTest {
 
     @BeforeEach
     public void setUp() {
+        bookRepository.deleteAll();
         book = new Book(
-                1L,
+                null,
                 "Władca pierścieni",
                 "J.R.R Tolkien",
                 "123456",
@@ -51,7 +52,7 @@ class BookRepositoryTest {
     public void testFindAllBooks() {
         // given
         Book book2 = new Book(
-                2L,
+                null,
                 "Pan Tadeusz",
                 "Adam Mickiesicz",
                 "123456",
@@ -59,10 +60,11 @@ class BookRepositoryTest {
                 "Fantasy",
                 new BigDecimal("49.99"),
                 true);
-        bookRepository.save(book);
+        System.out.println("Pierwsza ksiazka" + bookRepository.save(book));
         bookRepository.save(book2);
         // when
         List<Book> books = bookRepository.findAll();
+        books.forEach(System.out::println);
         // then
         assertThat(books).isNotNull();
         assertThat(books.size()).isEqualTo(2);
