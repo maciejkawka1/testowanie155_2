@@ -14,6 +14,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
@@ -46,5 +50,29 @@ class EmployeeServiceTest {
 
         // then
         assertThat(save).isEqualTo(employee);
+    }
+
+    @Test
+    public void givenExistingEmail_whenSaveEmployee_thenThrowException(){
+        // given
+        BDDMockito.given(employeeRepository.findByEmail(employee.getEmail()))
+                .willReturn(Optional.of(employee));
+
+        // when
+        assertThrows(RuntimeException.class, () -> employeeService.save(employee));
+
+        // then
+        verify(employeeRepository, never()).save(any(Employee.class));
+    }
+
+    @Test
+    public void givenEmployee_whenDeleteEmployee_thenDoNothing(){
+        // given
+        willDoNothing().given(employeeRepository).deleteById(anyLong());
+        // when
+        employeeService.delete(1L);
+
+        // then
+        verify(employeeRepository, times(1)).deleteById(anyLong());
     }
 }

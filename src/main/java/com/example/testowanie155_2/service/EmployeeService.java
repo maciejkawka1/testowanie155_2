@@ -20,4 +20,8 @@ public class EmployeeService {
             throw new RuntimeException("Employee already exists with given email:" + employee.getEmail());
         return employeeRepository.save(employee);
     }
+
+    public void delete(long id) {
+        employeeRepository.deleteById(id);
+    }
 }
