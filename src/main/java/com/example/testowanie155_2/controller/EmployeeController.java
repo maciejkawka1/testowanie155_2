@@ -5,6 +5,8 @@ import com.example.testowanie155_2.service.EmployeeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/employees")
 public class EmployeeController {
@@ -19,5 +21,10 @@ public class EmployeeController {
     @ResponseStatus(HttpStatus.CREATED)
     public Employee save(@RequestBody Employee employee){
         return employeeService.save(employee);
+    }
+
+    @GetMapping
+    public List<Employee> findAll(){
+        return employeeService.findAll();
     }
 }
