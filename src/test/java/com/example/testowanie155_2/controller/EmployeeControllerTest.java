@@ -17,6 +17,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -72,7 +73,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    public void x() throws Exception {
+    public void givenListOfEmployees_whenFindAll_thenReturnEmployeeListAndStatusOk() throws Exception {
         // given
         List<Employee> employeeList = new ArrayList<>();
         employeeList.add(employee);
@@ -90,4 +91,32 @@ class EmployeeControllerTest {
                         is(employeeList.size())));
     }
 
+
+    @Test
+    public void givenEmployeeId_whenFindById_thenReturnEmployee() throws Exception {
+        // given
+        BDDMockito.given(employeeService.findById(1L)).willReturn(Optional.of(employee));
+        // when
+        ResultActions response = mockMvc.perform(get("/api/employees/{id}", 1L));
+        // then
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.firstName",
+                        is(employee.getFirstName())))
+                .andExpect(jsonPath("$.lastName",
+                        is(employee.getLastName())))
+                .andExpect(jsonPath("$.email",
+                        is(employee.getEmail())));
+    }
+
+    @Test
+    public void givenEmployeeId_whenFindById_thenReturnNotFound() throws Exception {
+        // given
+        BDDMockito.given(employeeService.findById(1L)).willReturn(Optional.empty());
+        // when
+        ResultActions response = mockMvc.perform(get("/api/employees/{id}", 1L));
+        // then
+        response.andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
