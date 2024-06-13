@@ -1,6 +1,8 @@
 package com.example.testowanie155_2.service;
 
+import com.example.testowanie155_2.entity.Book;
 import com.example.testowanie155_2.entity.Employee;
+import com.example.testowanie155_2.repository.BookRepository;
 import com.example.testowanie155_2.repository.EmployeeRepository;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,7 @@
 package com.example.testowanie155_2.service;
 
 import com.example.testowanie155_2.entity.Employee;
+import com.example.testowanie155_2.repository.BookRepository;
 import com.example.testowanie155_2.repository.EmployeeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
@@ -22,12 +24,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+//@ExtendWith(MockitoExtension.class)
 class EmployeeServiceTest {
-    @Mock
-    private EmployeeRepository employeeRepository;
-    @InjectMocks
-    private EmployeeService employeeService;
+//    @Mock
+    private EmployeeRepository employeeRepository = mock(EmployeeRepository.class);
+
+//    @InjectMocks
+    private EmployeeService employeeService = new EmployeeService(employeeRepository);
 
     private Employee employee;
 
