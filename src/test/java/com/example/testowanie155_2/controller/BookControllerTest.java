@@ -14,8 +14,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.CoreMatchers.is;
@@ -62,5 +64,17 @@ class BookControllerTest {
         // then
         response.andExpect(status().isOk())
                 .andExpect(jsonPath("$.author", is(book.getAuthor())));
+    }
+
+    @Test
+    public void givenListOfBooks_whenFindAll_thenReturnListOfBook() throws Exception {
+        // given
+        List<Book> books = Arrays.asList(book, new Book(), new Book());
+        BDDMockito.given(bookService.findAll()).willReturn(books);
+
+        // when
+        // then
+        mockMvc.perform(get("/api/books")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(books.size())));
     }
 }
