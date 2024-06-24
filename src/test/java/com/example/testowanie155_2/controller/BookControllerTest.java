@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -76,5 +77,23 @@ class BookControllerTest {
         // then
         mockMvc.perform(get("/api/books")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(books.size())));
+    }
+    @Test
+    public void givenBookId_whenGetBookById_thenReturnsBook() throws Exception {
+        BDDMockito.given(bookService.findById(anyLong()))
+                .willReturn(Optional.of(book));
+
+        mockMvc.perform(get("/api/books/{id}", 1L))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is(book.getTitle())));
+    }
+
+    @Test
+    public void givenBookId_whenGetBookById_thenReturnsNotFound() throws Exception {
+        BDDMockito.given(bookService.findById(anyLong()))
+                .willReturn(Optional.empty());
+
+        mockMvc.perform(get("/api/books/{id}", 1L))
+                .andExpect(status().isNotFound());
     }
 }

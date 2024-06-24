@@ -24,4 +24,10 @@ public class BookController {
     public ResponseEntity<List<Book>> findAll(){
         return ResponseEntity.ok(bookService.findAll());
     }
+    @GetMapping("/{id}")
+    public ResponseEntity<Book> getBookById(@PathVariable Long id) {
+        return bookService.findById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
 }
