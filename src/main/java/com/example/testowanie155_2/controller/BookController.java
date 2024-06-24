@@ -30,4 +30,17 @@ public class BookController {
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
+    @PutMapping
+    public ResponseEntity<Book> updateBook(@RequestBody Book book) {
+        return ResponseEntity.ok(bookService.save(book));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long id) {
+        bookService.delete(id);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/genre/{genre}")
+    public ResponseEntity<List<Book>> findBooksByGenre(@PathVariable String genre) {
+        return ResponseEntity.ok(bookService.findBooksByGenre(genre));
+    }
 }

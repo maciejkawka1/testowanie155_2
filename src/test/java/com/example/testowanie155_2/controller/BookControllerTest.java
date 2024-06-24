@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -116,6 +117,23 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is(updatedBook.getTitle())))
                 .andExpect(jsonPath("$.author", is(updatedBook.getAuthor())));
+    }
+    @Test
+    public void givenBookId_whenDeleteBook_thenBookIsDeleted() throws Exception {
+        willDoNothing().given(bookService).delete(anyLong());
+
+        mockMvc.perform(delete("/api/books/{id}", 1L))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void givenGenre_whenFindBooksByGenre_thenReturnsBooks() throws Exception {
+        List<Book> books = Arrays.asList(new Book(), new Book());
+        given(bookService.findBooksByGenre(anyString())).willReturn(books);
+
+        mockMvc.perform(get("/api/books/genre/{genre}", "Fiction"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(books.size())));
     }
 
 }
