@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -96,4 +97,25 @@ class BookControllerTest {
         mockMvc.perform(get("/api/books/{id}", 1L))
                 .andExpect(status().isNotFound());
     }
+
+    @Test
+    public void givenUpdatedBook_whenUpdateBook_thenBookIsUpdated() throws Exception {
+        Book updatedBook = new Book();
+        updatedBook.setId(1L);
+        updatedBook.setTitle("Updated Title");
+        updatedBook.setAuthor("Updated Author");
+        updatedBook.setIsbn("987654321");
+        updatedBook.setPrice(new BigDecimal("20.99"));
+
+
+        given(bookService.save(any(Book.class))).willReturn(updatedBook);
+
+        mockMvc.perform(put("/api/books")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatedBook)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title", is(updatedBook.getTitle())))
+                .andExpect(jsonPath("$.author", is(updatedBook.getAuthor())));
+    }
+
 }
