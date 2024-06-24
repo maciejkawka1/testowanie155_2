@@ -148,7 +148,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    public void givenEmployeeIdAndUpdatedEmployee_whenUpdateEmploy_thenReturnStetusNotFound() throws Exception {
+    public void givenEmployeeIdAndUpdatedEmployee_whenUpdateEmploy_thenReturnStatusNotFound() throws Exception {
         // given
         Employee updatedEmployee = new Employee(
                 1L,

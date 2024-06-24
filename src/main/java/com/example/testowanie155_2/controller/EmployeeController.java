@@ -29,7 +29,7 @@ public class EmployeeController {
         return employeeService.findAll();
     }
 
-    @GetMapping("{id}")
+    @GetMapping("/{id}")
     public ResponseEntity<Employee> findById(@PathVariable long id){
         return employeeService.findById(id)
                 .map(ResponseEntity::ok)
@@ -49,7 +49,7 @@ public class EmployeeController {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable long id){
         employeeService.delete(id);
         return new ResponseEntity<>("Employee deleted successfully!." , HttpStatus.OK);
