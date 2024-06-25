@@ -46,7 +46,13 @@ public class BookController {
 
     @GetMapping("/author/{author}/year/{year}")
     public ResponseEntity<List<Book>> findBooksByAuthorAndYear(@PathVariable String author, @PathVariable int year) {
-        return ResponseEntity.ok(bookService.findBooksByAuthorAndYear(author, year));
+        List<Book> books = bookService.findBooksByAuthorAndYear(author, year);
+
+        if (books.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        } else {
+            return ResponseEntity.ok(books);
+        }
     }
 
 }
