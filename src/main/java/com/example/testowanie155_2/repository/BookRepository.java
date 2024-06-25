@@ -19,4 +19,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     Optional<Book> findByIsbn(String isbn);
 
     List<Book> findBooksCheaperThan(BigDecimal price);
+
+    List<Book> findAllAvailableBooks();
 }

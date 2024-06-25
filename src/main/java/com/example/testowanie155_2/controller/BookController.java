@@ -73,4 +73,9 @@ public class BookController {
         return books.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(books) ;
     }
 
+    @GetMapping("/available")
+    public ResponseEntity<List<Book>> findAllAvailableBooks() {
+        return ResponseEntity.ok(bookService.findAllAvailableBooks());
+    }
+
 }

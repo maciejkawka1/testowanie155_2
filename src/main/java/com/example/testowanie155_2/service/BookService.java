@@ -51,4 +51,8 @@ public class BookService {
     public List<Book> findBooksCheaperThan(BigDecimal price) {
         return bookRepository.findBooksCheaperThan(price);
     }
+    public List<Book> findAllAvailableBooks() {
+        return bookRepository.findAllAvailableBooks();
+    }
+
 }
