@@ -39,4 +39,7 @@ public class BookService {
     public List<Book> findBooksByAuthorAndYear(String author, int year) {
         return bookRepository.findBooksByAuthorAndPublishedYear(author, year);
     }
+    public int countBooksByPublishedYear(int year) {
+        return bookRepository.countBooksByPublishedYear(year);
+    }
 }

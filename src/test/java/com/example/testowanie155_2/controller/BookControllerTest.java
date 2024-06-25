@@ -20,10 +20,9 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.CoreMatchers.is;
 import static org.mockito.ArgumentMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(BookController.class)
@@ -165,5 +164,20 @@ class BookControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().isNotFound());
+    }
+    @Test
+    public void givenYear_whenCountBooksByPublishedYear_thenReturnCount() throws Exception {
+        // given
+        int year = 1954;
+        int count = 1;
+        given(bookService.countBooksByPublishedYear(year)).willReturn(count);
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/count/year/{year}", year));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(content().string(String.valueOf(count)));
     }
 }

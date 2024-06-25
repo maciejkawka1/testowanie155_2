@@ -55,4 +55,9 @@ public class BookController {
         }
     }
 
+    @GetMapping("/count/year/{year}")
+    public ResponseEntity<Integer> countBooksByPublishedYear(@PathVariable int year) {
+        return ResponseEntity.ok(bookService.countBooksByPublishedYear(year));
+    }
+
 }
