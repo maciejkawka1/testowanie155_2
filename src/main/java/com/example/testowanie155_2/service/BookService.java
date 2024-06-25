@@ -35,4 +35,8 @@ public class BookService {
     public List<Book> findBooksByGenre(String genre) {
         return bookRepository.findByGenre(genre);
     }
+
+    public List<Book> findBooksByAuthorAndYear(String author, int year) {
+        return bookRepository.findBooksByAuthorAndPublishedYear(author, year);
+    }
 }

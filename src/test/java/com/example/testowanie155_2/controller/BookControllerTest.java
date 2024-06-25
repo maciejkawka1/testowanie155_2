@@ -15,12 +15,14 @@ import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.hamcrest.CoreMatchers.is;
@@ -132,6 +134,23 @@ class BookControllerTest {
         given(bookService.findBooksByGenre(anyString())).willReturn(books);
 
         mockMvc.perform(get("/api/books/genre/{genre}", "Fiction"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(books.size())));
+    }
+
+    @Test
+    public void givenAuthorAndYear_whenFindBooksByAuthorAndYear_thenReturnBooksList() throws Exception {
+        // given
+        String author = "J.R.R Tolkien";
+        int year = 1954;
+        List<Book> books = Collections.singletonList(book);
+        given(bookService.findBooksByAuthorAndYear(author, year)).willReturn(books);
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/author/{author}/year/{year}", author, year));
+
+        // then
+        response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(books.size())));
     }
