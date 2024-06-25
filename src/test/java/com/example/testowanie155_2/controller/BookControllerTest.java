@@ -252,4 +252,17 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(books.size())));
     }
+
+    @Test
+    public void whenFindAllAvailableBooks_thenReturnNotFound() throws Exception {
+        // given
+        given(bookService.findAllAvailableBooks()).willReturn(new ArrayList<>());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/available"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
