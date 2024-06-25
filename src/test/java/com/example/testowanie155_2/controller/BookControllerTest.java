@@ -185,7 +185,7 @@ class BookControllerTest {
     public void givenValidIsbn_whenFindByIsbn_thenReturnBook() throws Exception {
         // given
         String isbn = "1234567890123";
-        given(bookService.findByIsbn(isbn)).willReturn(book);
+        given(bookService.findByIsbn(isbn)).willReturn(Optional.of(book));
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", isbn));
@@ -194,5 +194,18 @@ class BookControllerTest {
         response.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isbn", is(book.getIsbn())));
+    }
+
+    @Test
+    public void givenValidIsbn_whenFindByIsbn_thenReturnNotFound() throws Exception {
+        // given
+        given(bookService.findByIsbn(anyString())).willReturn(Optional.empty());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", "abc"));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isNotFound());
     }
 }
