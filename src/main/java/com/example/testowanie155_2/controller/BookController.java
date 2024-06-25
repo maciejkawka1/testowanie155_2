@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -64,6 +65,12 @@ public class BookController {
     @GetMapping("/isbn/{isbn}")
     public ResponseEntity<Book> findByIsbn(@PathVariable String isbn) {
         return bookService.findByIsbn(isbn).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/price/cheaper-than/{price}")
+    public ResponseEntity<List<Book>> findBooksCheaperThan(@PathVariable BigDecimal price) {
+        List<Book> books = bookService.findBooksCheaperThan(price);
+        return books.isEmpty() ? ResponseEntity.notFound().build() : ResponseEntity.ok(books) ;
     }
 
 }

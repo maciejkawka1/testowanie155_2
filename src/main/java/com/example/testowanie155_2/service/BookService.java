@@ -5,6 +5,7 @@ import com.example.testowanie155_2.repository.BookRepository;
 import io.micrometer.observation.ObservationFilter;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,5 +46,9 @@ public class BookService {
 
     public Optional<Book> findByIsbn(String isbn) {
         return bookRepository.findByIsbn(isbn);
+    }
+
+    public List<Book> findBooksCheaperThan(BigDecimal price) {
+        return bookRepository.findBooksCheaperThan(price);
     }
 }

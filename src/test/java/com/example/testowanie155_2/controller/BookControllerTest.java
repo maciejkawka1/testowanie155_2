@@ -208,4 +208,33 @@ class BookControllerTest {
         response.andDo(print())
                 .andExpect(status().isNotFound());
     }
+    @Test
+    public void givenPrice_whenFindBooksCheaperThan_thenReturnBooksList() throws Exception {
+        // given
+        BigDecimal price = new BigDecimal("20.00");
+        List<Book> books = Collections.singletonList(book);
+        given(bookService.findBooksCheaperThan(price)).willReturn(books);
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/price/cheaper-than/{price}", price));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size()", is(books.size())));
+    }
+
+    @Test
+    public void givenPrice_whenFindBooksCheaperThan_thenReturnNotFound() throws Exception {
+        // given
+
+        given(bookService.findBooksCheaperThan(null)).willReturn(new ArrayList<>());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/price/cheaper-than/{price}", 20));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
