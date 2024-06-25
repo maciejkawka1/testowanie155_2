@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/books")
@@ -58,6 +59,11 @@ public class BookController {
     @GetMapping("/count/year/{year}")
     public ResponseEntity<Integer> countBooksByPublishedYear(@PathVariable int year) {
         return ResponseEntity.ok(bookService.countBooksByPublishedYear(year));
+    }
+
+    @GetMapping("/isbn/{isbn}")
+    public ResponseEntity<Book> findByIsbn(@PathVariable String isbn) {
+        return bookService.findByIsbn(isbn).map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

@@ -42,4 +42,8 @@ public class BookService {
     public int countBooksByPublishedYear(int year) {
         return bookRepository.countBooksByPublishedYear(year);
     }
+
+    public Optional<Book> findByIsbn(String isbn) {
+        return bookRepository.findByIsbn(isbn);
+    }
 }

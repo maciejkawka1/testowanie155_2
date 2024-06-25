@@ -180,4 +180,19 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().string(String.valueOf(count)));
     }
+
+    @Test
+    public void givenValidIsbn_whenFindByIsbn_thenReturnBook() throws Exception {
+        // given
+        String isbn = "1234567890123";
+        given(bookService.findByIsbn(isbn)).willReturn(book);
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", isbn));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.isbn", is(book.getIsbn())));
+    }
 }
