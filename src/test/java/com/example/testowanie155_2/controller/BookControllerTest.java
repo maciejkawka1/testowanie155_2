@@ -14,10 +14,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
@@ -155,4 +152,18 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.size()", is(books.size())));
     }
 
+    @Test
+    public void givenAuthorAndYear_whenFindBooksByAuthorAndYear_thenReturnNotFound() throws Exception {
+        // given
+        String author = "J.R.R Tolkien";
+        int year = 1954;
+        given(bookService.findBooksByAuthorAndYear(author, year)).willReturn(new ArrayList<>());
+
+        // when
+        ResultActions response = mockMvc.perform(get("/api/books/author/{author}/year/{year}", author, year));
+
+        // then
+        response.andDo(print())
+                .andExpect(status().isNotFound());
+    }
 }
