@@ -1,14 +1,13 @@
 package com.example.testowanie155_2.controller;
 
 import com.example.testowanie155_2.entity.Book;
-import com.example.testowanie155_2.service.BookService;
+import com.example.testowanie155_2.repository.BookRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -16,21 +15,23 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.math.BigDecimal;
 import java.util.*;
 
+import static org.hamcrest.CoreMatchers.is;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.hamcrest.CoreMatchers.is;
-import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(BookController.class)
-class BookControllerTest {
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT) // uruchamiamy serwer na
+@AutoConfigureMockMvc
+class BookControllerITest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private BookService bookService;
+    @Autowired
+    private BookRepository bookRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -38,7 +39,8 @@ class BookControllerTest {
     private Book book;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
+        bookRepository.deleteAll();
         book = new Book();
         book.setId(1L);
         book.setTitle("test title");
@@ -53,8 +55,6 @@ class BookControllerTest {
     @Test
     public void givenBook_whenSave_thenReturnBook() throws Exception {
         // given
-        BDDMockito.given(bookService.save(any(Book.class))).willReturn(book);
-
         // when
         ResultActions response = mockMvc.perform(post("/api/books")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -70,43 +70,40 @@ class BookControllerTest {
     public void givenListOfBooks_whenFindAll_thenReturnListOfBook() throws Exception {
         // given
         List<Book> books = Arrays.asList(book, new Book(), new Book());
-        BDDMockito.given(bookService.findAll()).willReturn(books);
+        bookRepository.saveAll(books);
 
         // when
         // then
         mockMvc.perform(get("/api/books")).andExpect(status().isOk())
                 .andExpect(jsonPath("$.size()", is(books.size())));
     }
+
     @Test
     public void givenBookId_whenGetBookById_thenReturnsBook() throws Exception {
-        BDDMockito.given(bookService.findById(anyLong()))
-                .willReturn(Optional.of(book));
+        Long id = bookRepository.save(book).getId();
 
-        mockMvc.perform(get("/api/books/{id}", 1L))
+        mockMvc.perform(get("/api/books/{id}", id))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title", is(book.getTitle())));
     }
 
     @Test
     public void givenBookId_whenGetBookById_thenReturnsNotFound() throws Exception {
-        BDDMockito.given(bookService.findById(anyLong()))
-                .willReturn(Optional.empty());
-
         mockMvc.perform(get("/api/books/{id}", 1L))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     public void givenUpdatedBook_whenUpdateBook_thenBookIsUpdated() throws Exception {
+        Long id = bookRepository.save(book).getId();
+
         Book updatedBook = new Book();
-        updatedBook.setId(1L);
+        updatedBook.setId(id);
         updatedBook.setTitle("Updated Title");
         updatedBook.setAuthor("Updated Author");
         updatedBook.setIsbn("987654321");
         updatedBook.setPrice(new BigDecimal("20.99"));
 
-
-        given(bookService.save(any(Book.class))).willReturn(updatedBook);
 
         mockMvc.perform(put("/api/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -115,31 +112,32 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.title", is(updatedBook.getTitle())))
                 .andExpect(jsonPath("$.author", is(updatedBook.getAuthor())));
     }
+
     @Test
     public void givenBookId_whenDeleteBook_thenBookIsDeleted() throws Exception {
-        willDoNothing().given(bookService).delete(anyLong());
+        Long id = bookRepository.save(book).getId();
 
-        mockMvc.perform(delete("/api/books/{id}", 1L))
+        mockMvc.perform(delete("/api/books/{id}", id))
                 .andExpect(status().isOk());
     }
 
     @Test
     public void givenGenre_whenFindBooksByGenre_thenReturnsBooks() throws Exception {
-        List<Book> books = Arrays.asList(new Book(), new Book());
-        given(bookService.findBooksByGenre(anyString())).willReturn(books);
+        List<Book> books = Arrays.asList(book, new Book(), new Book());
+        bookRepository.saveAll(books);
 
-        mockMvc.perform(get("/api/books/genre/{genre}", "Fiction"))
+        mockMvc.perform(get("/api/books/genre/{genre}", book.getGenre()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(books.size())));
+                .andExpect(jsonPath("$.size()", is(1)));
     }
 
     @Test
     public void givenAuthorAndYear_whenFindBooksByAuthorAndYear_thenReturnBooksList() throws Exception {
         // given
-        String author = "J.R.R Tolkien";
-        int year = 1954;
+        String author = book.getAuthor();
+        int year = book.getPublishedYear();
         List<Book> books = Collections.singletonList(book);
-        given(bookService.findBooksByAuthorAndYear(author, year)).willReturn(books);
+        bookRepository.saveAll(books);
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/author/{author}/year/{year}", author, year));
@@ -153,23 +151,19 @@ class BookControllerTest {
     @Test
     public void givenAuthorAndYear_whenFindBooksByAuthorAndYear_thenReturnNotFound() throws Exception {
         // given
-        String author = "J.R.R Tolkien";
-        int year = 1954;
-        given(bookService.findBooksByAuthorAndYear(author, year)).willReturn(new ArrayList<>());
-
         // when
-        ResultActions response = mockMvc.perform(get("/api/books/author/{author}/year/{year}", author, year));
+        ResultActions response = mockMvc.perform(get("/api/books/author/{author}/year/{year}", book.getAuthor(), book.getPublishedYear()));
 
         // then
         response.andDo(print())
                 .andExpect(status().isNotFound());
     }
+
     @Test
     public void givenYear_whenCountBooksByPublishedYear_thenReturnCount() throws Exception {
         // given
-        int year = 1954;
+        int year = bookRepository.save(book).getPublishedYear();
         int count = 1;
-        given(bookService.countBooksByPublishedYear(year)).willReturn(count);
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/count/year/{year}", year));
@@ -183,8 +177,7 @@ class BookControllerTest {
     @Test
     public void givenValidIsbn_whenFindByIsbn_thenReturnBook() throws Exception {
         // given
-        String isbn = "1234567890123";
-        given(bookService.findByIsbn(isbn)).willReturn(Optional.of(book));
+        String isbn = bookRepository.save(book).getIsbn();
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", isbn));
@@ -198,21 +191,18 @@ class BookControllerTest {
     @Test
     public void givenValidIsbn_whenFindByIsbn_thenReturnNotFound() throws Exception {
         // given
-        given(bookService.findByIsbn(anyString())).willReturn(Optional.empty());
-
         // when
-        ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", "abc"));
+        ResultActions response = mockMvc.perform(get("/api/books/isbn/{isbn}", book.getIsbn()));
 
         // then
         response.andDo(print())
                 .andExpect(status().isNotFound());
     }
+
     @Test
     public void givenPrice_whenFindBooksCheaperThan_thenReturnBooksList() throws Exception {
         // given
-        BigDecimal price = new BigDecimal("20.00");
-        List<Book> books = Collections.singletonList(book);
-        given(bookService.findBooksCheaperThan(price)).willReturn(books);
+        BigDecimal price = bookRepository.save(book).getPrice().add(new BigDecimal(1));
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/price/cheaper-than/{price}", price));
@@ -220,15 +210,12 @@ class BookControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(books.size())));
+                .andExpect(jsonPath("$.size()", is(1)));
     }
 
     @Test
     public void givenPrice_whenFindBooksCheaperThan_thenReturnNotFound() throws Exception {
         // given
-
-        given(bookService.findBooksCheaperThan(null)).willReturn(new ArrayList<>());
-
         // when
         ResultActions response = mockMvc.perform(get("/api/books/price/cheaper-than/{price}", 20));
 
@@ -240,8 +227,8 @@ class BookControllerTest {
     @Test
     public void whenFindAllAvailableBooks_thenReturnBooksList() throws Exception {
         // given
-        List<Book> books = Collections.singletonList(book);
-        given(bookService.findAllAvailableBooks()).willReturn(books);
+        List<Book> books = Arrays.asList(book, new Book(), new Book());
+        bookRepository.saveAll(books);
 
         // when
         ResultActions response = mockMvc.perform(get("/api/books/available"));
@@ -249,14 +236,12 @@ class BookControllerTest {
         // then
         response.andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()", is(books.size())));
+                .andExpect(jsonPath("$.size()", is(1)));
     }
 
     @Test
     public void whenFindAllAvailableBooks_thenReturnNotFound() throws Exception {
         // given
-        given(bookService.findAllAvailableBooks()).willReturn(new ArrayList<>());
-
         // when
         ResultActions response = mockMvc.perform(get("/api/books/available"));
 
